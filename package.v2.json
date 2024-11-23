@@ -1,29 +1,14 @@
 {
-    "SiteData": {
+    "GetSiteData": {
         "name": "获取站点数据",
-        "description": "站刷新站点数据，并发送消息，生成站点统计数据图表。",
+        "description": "刷新站点数据，发送数据消息通知，生成站点统计数据图表。",
         "labels": "站点,仪表板",
-        "version": "1.0.0",
+        "version": "0.0.1",
         "icon": "statistic.png",
         "author": "jianlongzhang1990,lightolly,jxxghp",
         "level": 2,
         "history": {
             "v1.0.0": "基于MoviePilot V2 版本站点数据统计插件，增加站点数据消息通知"
-        }
-    },
-    "AutoSeed": {
-        "name": "自动辅种",
-        "description": "基于IYUU官方Api实现自动辅种。",
-        "labels": "做种,IYUU",
-        "version": "2.3",
-        "icon": "IYUU.png",
-        "author": "jianlongzhang1990,jxxghp",
-        "level": 2,
-        "history": {
-            "v2.3": "增加远程命令功能",
-            "v2.2": "修复种子校验服务未生效",
-            "v2.1": "调整IYUU最新域名",
-            "v2.0": "兼容MoviePilot V2 版本"
         }
     }
 }
