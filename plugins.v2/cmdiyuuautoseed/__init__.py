@@ -11,7 +11,6 @@ from lxml import etree
 from ruamel.yaml import CommentedMap
 
 from app.core.config import settings
-from app import schemas
 from app.core.event import Event, eventmanager
 from app.db.site_oper import SiteOper
 from app.helper.downloader import DownloaderHelper
@@ -25,21 +24,21 @@ from app.schemas.types import EventType
 from app.utils.http import RequestUtils
 from app.utils.string import StringUtils
 
-class AutoSeed(_PluginBase):
+class CmdIyuuAutoSeed(_PluginBase):
     # 插件名称
-    plugin_name = "IYUU自动辅种-命令版本"
+    plugin_name = "远程命令辅种"
     # 插件描述
     plugin_desc = "基于IYUU官方Api实现自动辅种，可远程命令。"
     # 插件图标
     plugin_icon = "IYUU.png"
     # 插件版本
-    plugin_version = "2.3"
+    plugin_version = "0.1"
     # 插件作者
     plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页
     author_url = "https://github.com/jianlongzhang1990"
     # 插件配置项ID前缀
-    plugin_config_prefix = "iyuuautoseed_"
+    plugin_config_prefix = "cmdiyuuautoseed_"
     # 加载顺序
     plugin_order = 17
     # 可使用的用户级别
@@ -1265,7 +1264,7 @@ class AutoSeed(_PluginBase):
         return [{
             "cmd": "/auto_seed",
             "event": EventType.PluginAction,
-            "desc": "自动辅种",
+            "desc": "辅种",
             "category": "站点",
             "data": {
                 "action": "auto_seed"

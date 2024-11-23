@@ -38,7 +38,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "0.0.3"
+    plugin_version = "1.0.0"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -91,12 +91,12 @@ class GetSiteData(_PluginBase):
         :return: 命令关键字、事件、描述、附带数据
         """
         return [{
-            "cmd": "/site_data",
+            "cmd": "/get_site_data",
             "event": EventType.PluginAction,
             "desc": "获取站点数据",
             "category": "站点",
             "data": {
-                "action": "site_data"
+                "action": "get_site_data"
             }
         }]
 
@@ -859,7 +859,7 @@ class GetSiteData(_PluginBase):
         """
         if event:
             event_data = event.event_data
-            if not event_data or event_data.get("action") != "site_data":
+            if not event_data or event_data.get("action") != "get_site_data":
                 return
             logger.info("收到命令，开始刷新站点数据 ...")
             self.post_message(channel=event.event_data.get("channel"),

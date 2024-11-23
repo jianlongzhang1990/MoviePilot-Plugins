@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from threading import Event
+from threading import Event as ThreadEvent
 from typing import Any, List, Dict, Tuple, Optional, Union
 
 import pytz
@@ -9,6 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from bencode import bdecode, bencode
 
+from app.core.event import Event, eventmanager
 from app.core.config import settings
 from app.helper.downloader import DownloaderHelper
 from app.helper.torrent import TorrentHelper
@@ -18,23 +19,24 @@ from app.modules.transmission import Transmission
 from app.plugins import _PluginBase
 from app.schemas import NotificationType, ServiceInfo
 from app.utils.string import StringUtils
+from app.schemas.types import EventType
 
 
-class TorrentTransfer(_PluginBase):
+class CMDTorrentTransfer(_PluginBase):
     # 插件名称
-    plugin_name = "自动转移做种"
+    plugin_name = "转移做种"
     # 插件描述
-    plugin_desc = "定期转移下载器中的做种任务到另一个下载器。"
+    plugin_desc = "定期转移下载器中的做种任务到另一个下载器,支持远程命令。"
     # 插件图标
     plugin_icon = "seed.png"
     # 插件版本
-    plugin_version = "1.7.1"
+    plugin_version = "0.0.1"
     # 插件作者
-    plugin_author = "jxxghp"
+    plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页
-    author_url = "https://github.com/jxxghp"
+    author_url = "https://github.com/jianlongzhang1990"
     # 插件配置项ID前缀
-    plugin_config_prefix = "torrenttransfer_"
+    plugin_config_prefix = "cmdtorrenttransfer_"
     # 加载顺序
     plugin_order = 18
     # 可使用的用户级别
@@ -64,7 +66,7 @@ class TorrentTransfer(_PluginBase):
     _transferemptylabel = False
     _add_torrent_tags = None
     # 退出事件
-    _event = Event()
+    _event = ThreadEvent()
     # 待检查种子清单
     _recheck_torrents = {}
     _is_recheck_running = False
@@ -157,7 +159,37 @@ class TorrentTransfer(_PluginBase):
 
     @staticmethod
     def get_command() -> List[Dict[str, Any]]:
-        pass
+        """
+        定义远程控制命令
+        :return: 命令关键字、事件、描述、附带数据
+        """
+        return [{
+            "cmd": "/transfer_seed",
+            "event": EventType.PluginAction,
+            "desc": "转种",
+            "category": "站点",
+            "data": {
+                "action": "transfer_seed"
+            }
+        }]
+
+    @eventmanager.register(EventType.PluginAction)
+    def refresh(self, event: Event):
+        """
+        刷新站点数据
+        """
+        if event:
+            event_data = event.event_data
+            if not event_data or event_data.get("action") != "transfer_seed":
+                return
+            logger.info("收到命令，开始转种 ...")
+            self.post_message(channel=event.event_data.get("channel"),
+                              title="开始转种 ...",
+                              userid=event.event_data.get("user"))
+        self.transfer()
+        if event:
+            self.post_message(channel=event.event_data.get("channel"),
+                              title="转种完成！", userid=event.event_data.get("user"))
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
