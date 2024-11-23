@@ -38,7 +38,7 @@ class SiteData(_PluginBase):
     # 作者主页
     author_url = "https://github.com/jianlongzhang1990"
     # 插件配置项ID前缀
-    plugin_config_prefix = "sitesdata_"
+    plugin_config_prefix = "sitedata_"
     # 加载顺序
     plugin_order = 1
     # 可使用的用户级别
@@ -958,61 +958,7 @@ class SiteData(_PluginBase):
             self.post_message(mtype=NotificationType.SiteMessage,
                               title="站点数据统计", text="\n".join(sorted_messages))
         logger.info(f'计算今日数据 yesterday_sites_data:({yesterday_sites_data})')
-        # 计算增量数据集
-        today_messages = {}
-        inc_data = {}
 
-        for data in stattistic_data:
-            logger.info(f'计算今日数据yesterday_sites_data ({yesterday_sites_data})')
-            yesterday_datas = [yd for yd in yesterday_sites_data if yd.domain == data.domain]
-            logger.info(f'计算今日数据 yesterday_datas({yesterday_datas})')
-            if yesterday_datas:
-                yesterday_data = yesterday_datas[0]
-            else:
-                yesterday_data = None
-            logger.info(f'计算今日数据yesterday_data ({yesterday_data})')
-            inc = __sub_data(data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
-            if inc:
-                inc_data[data.name] = inc
-        logger.info(f'计算今日数据inc_data: ({inc_data})')
-        # 今日上传
-        uploads = {k: v for k, v in inc_data.items() if v.get("upload") if v.get("upload") > 0}
-        # 今日上传站点
-        upload_sites = [site for site in uploads.keys()]
-        # 今日上传数据
-        upload_datas = [__gb(data.get("upload")) for data in uploads.values()]
-        # 今日上传总量
-        today_upload = round(sum(upload_datas), 2)
-        # 今日下载
-        downloads = {k: v for k, v in inc_data.items() if v.get("download") if v.get("download") > 0}
-        # 今日下载站点
-        download_sites = [site for site in downloads.keys()]
-        # 今日下载数据
-        download_datas = [__gb(data.get("download")) for data in downloads.values()]
-        # 今日下载总量
-        today_download = round(sum(download_datas), 2)
-        rand = 0
-        for site, data in inc_data.items():
-            upload = data.get("upload")
-            download = data.get("download")
-
-            if upload > 0 or download > 0:
-                today_messages[upload + (rand / 1000)] = (
-                        f"【{site}】{today}\n"
-                        + f"上传量：{StringUtils.str_filesize(upload)}\n"
-                        + f"下载量：{StringUtils.str_filesize(download)}\n"
-                        + "————————————"
-                )
-            rand += 1
-
-        if today_upload or today_download:
-            sorted_today_messages = [today_messages[key] for key in sorted(today_messages.keys(), reverse=True)]
-            sorted_today_messages.insert(0, f"【今日汇总】\n"
-                                            f"总上传：{StringUtils.str_filesize(today_upload)}\n"
-                                            f"总下载：{StringUtils.str_filesize(today_download)}\n"
-                                            f"————————————")
-            self.post_message(mtype=NotificationType.SiteMessage,
-                              title="今日站点数据统计", text="\n".join(sorted_today_messages))
         if event:
             self.post_message(channel=event.event_data.get("channel"),
                               title="站点数据刷新完成！", userid=event.event_data.get("user"))
