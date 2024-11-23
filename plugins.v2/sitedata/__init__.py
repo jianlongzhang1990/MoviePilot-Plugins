@@ -913,7 +913,7 @@ class SiteData(_PluginBase):
                 return
             logger.info("收到命令，开始刷新站点数据 ...")
             self.post_message(channel=event.event_data.get("channel"),
-                              title="开始刷新站点数据 ...",
+                              title="开始刷新站点数据1 ...",
                               userid=event.event_data.get("user"))
         SiteChain().refresh_userdatas()
         # 获取数据
