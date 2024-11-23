@@ -38,7 +38,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "0.0.2"
+    plugin_version = "0.0.3"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -915,19 +915,17 @@ class GetSiteData(_PluginBase):
                                       f"————————————")
             self.post_message(mtype=NotificationType.SiteMessage,
                               title="站点数据统计", text="\n".join(sorted_messages))
-        logger.info(f'计算今日数据 yesterday_sites_data:({yesterday_sites_data})')
         # 计算增量数据集
         today_messages = {}
         inc_data = {}
         for today_data in stattistic_data:
-            logger.info(f'计算今日数据 ({yesterday_sites_data})')
             yesterday_datas = [yd for yd in yesterday_sites_data if yd.domain == today_data.domain]
-            logger.info(f'计算今日数据yd.domain: ({yd.domain})today_data.domain: ({today_data.domain})')
+            logger.info(f'计算今日数据yd.domain: ({today_data.domain})today_data.domain: ({today_data.domain})')
             if yesterday_datas:
                 yesterday_data = yesterday_datas[0]
             else:
                 yesterday_data = None
-            inc = self.__sub_data(yesterday_data.to_dict() if yesterday_data else None)
+            inc = self.__sub_data(self, today_data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
             if inc:
                 inc_data[today_data.name] = inc
         logger.info(f'计算今日数据inc_data: ({inc_data})')

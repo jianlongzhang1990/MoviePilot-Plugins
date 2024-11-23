@@ -3,7 +3,7 @@
         "name": "获取站点数据",
         "description": "刷新站点数据，发送数据消息通知，生成站点统计数据图表。",
         "labels": "站点,仪表板",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "icon": "statistic.png",
         "author": "jianlongzhang1990,lightolly,jxxghp",
         "level": 2,
