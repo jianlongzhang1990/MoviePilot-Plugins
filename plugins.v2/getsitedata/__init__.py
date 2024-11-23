@@ -24,13 +24,11 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 lock = Lock()
 
-
 def format_bonus(bonus):
     try:
         return f'{float(bonus):,.1f}'
     except ValueError:
         return '0.0'
-
 
 class GetSiteData(_PluginBase):
     # 插件名称
@@ -40,7 +38,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "0.0.1"
+    plugin_version = "0.0.2"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -95,7 +93,7 @@ class GetSiteData(_PluginBase):
         return [{
             "cmd": "/site_data",
             "event": EventType.PluginAction,
-            "desc": "站点数据统计-通知消息",
+            "desc": "获取站点数据",
             "category": "站点",
             "data": {
                 "action": "site_data"
@@ -228,60 +226,11 @@ class GetSiteData(_PluginBase):
         return today, stattistic_data, yesterday_sites_data
 
     @staticmethod
-    def __get_total_elements(today: str, stattistic_data: List[SiteUserData], yesterday_sites_data: List[SiteUserData],
+    def __get_total_elements(self, today: str, stattistic_data: List[SiteUserData], yesterday_sites_data: List[SiteUserData],
                              dashboard: str = "today") -> List[dict]:
         """
         获取统计元素
         """
-
-        def __gb(value: int) -> float:
-            """
-            转换为GB，保留1位小数
-            """
-            if not value:
-                return 0
-            return round(float(value) / 1024 / 1024 / 1024, 1)
-
-        def __is_digit(value: any) -> bool:
-            """
-            判断是否为数字
-            """
-            if value is None:
-                return False
-            if isinstance(value, float) or isinstance(value, int):
-                return True
-            if isinstance(value, str):
-                return value.isdigit()
-            return False
-
-        def __to_numeric(value: any) -> int:
-            """
-            将值转换为整数
-            """
-            if isinstance(value, str):
-                return int(float(value))
-            elif isinstance(value, float) or isinstance(value, int):
-                return int(value)
-            else:
-                logger.error(f'数据类型转换错误 ({value})')
-                return 0
-
-        def __sub_data(d1: dict, d2: dict) -> dict:
-            """
-            计算两个字典相同Key值的差值（如果值为数字），返回新字典
-            """
-            if not d1:
-                return {}
-            if not d2:
-                return d1
-            d = {k: __to_numeric(d1.get(k)) - __to_numeric(d2.get(k)) for k in d1
-                 if k in d2 and __is_digit(d1.get(k)) and __is_digit(d2.get(k))}
-            # 把小于0的数据变成0
-            for k, v in d.items():
-                if str(v).isdigit() and int(v) < 0:
-                    d[k] = 0
-            return d
-
         if dashboard in ['total', 'all']:
             # 总上传量
             total_upload = sum([data.upload for data in stattistic_data if data.upload])
@@ -582,7 +531,7 @@ class GetSiteData(_PluginBase):
                     yesterday_data = yesterday_datas[0]
                 else:
                     yesterday_data = None
-                inc = __sub_data(data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
+                inc = self.__sub_data(data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
                 if inc:
                     inc_data[data.name] = inc
             # 今日上传
@@ -917,6 +866,12 @@ class GetSiteData(_PluginBase):
                               title="开始刷新站点数据 ...",
                               userid=event.event_data.get("user"))
         SiteChain().refresh_userdatas()
+        self.notify(event)
+        if event:
+            self.post_message(channel=event.event_data.get("channel"),
+                              title="站点数据刷新完成！", userid=event.event_data.get("user"))
+
+    def notify(self, event):
         # 获取数据
         today, stattistic_data, yesterday_sites_data = self.__get_data()
         if not stattistic_data:
@@ -950,7 +905,6 @@ class GetSiteData(_PluginBase):
                         + "————————————"
                 )
             rand += 1
-
         if total_upload or total_download:
             sorted_messages = [messages[key] for key in sorted(messages.keys(), reverse=True)]
             sorted_messages.insert(0, f"【汇总】\n"
@@ -962,28 +916,27 @@ class GetSiteData(_PluginBase):
             self.post_message(mtype=NotificationType.SiteMessage,
                               title="站点数据统计", text="\n".join(sorted_messages))
         logger.info(f'计算今日数据 yesterday_sites_data:({yesterday_sites_data})')
-
         # 计算增量数据集
         today_messages = {}
         inc_data = {}
-
-        for data in stattistic_data:
+        for today_data in stattistic_data:
             logger.info(f'计算今日数据 ({yesterday_sites_data})')
-            yesterday_datas = [yd for yd in yesterday_sites_data if yd.domain == data.domain]
+            yesterday_datas = [yd for yd in yesterday_sites_data if yd.domain == today_data.domain]
+            logger.info(f'计算今日数据yd.domain: ({yd.domain})today_data.domain: ({today_data.domain})')
             if yesterday_datas:
                 yesterday_data = yesterday_datas[0]
             else:
                 yesterday_data = None
-            inc = __sub_data(data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
+            inc = self.__sub_data(yesterday_data.to_dict() if yesterday_data else None)
             if inc:
-                inc_data[data.name] = inc
+                inc_data[today_data.name] = inc
         logger.info(f'计算今日数据inc_data: ({inc_data})')
         # 今日上传
         uploads = {k: v for k, v in inc_data.items() if v.get("upload") if v.get("upload") > 0}
         # 今日上传站点
         upload_sites = [site for site in uploads.keys()]
         # 今日上传数据
-        upload_datas = [__gb(data.get("upload")) for data in uploads.values()]
+        upload_datas = [self.__gb(data.get("upload")) for data in uploads.values()]
         # 今日上传总量
         today_upload = round(sum(upload_datas), 2)
         # 今日下载
@@ -991,7 +944,7 @@ class GetSiteData(_PluginBase):
         # 今日下载站点
         download_sites = [site for site in downloads.keys()]
         # 今日下载数据
-        download_datas = [__gb(data.get("download")) for data in downloads.values()]
+        download_datas = [self.__gb(data.get("download")) for data in downloads.values()]
         # 今日下载总量
         today_download = round(sum(download_datas), 2)
         rand = 0
@@ -1007,7 +960,6 @@ class GetSiteData(_PluginBase):
                         + "————————————"
                 )
             rand += 1
-
         if today_upload or today_download:
             sorted_today_messages = [today_messages[key] for key in sorted(today_messages.keys(), reverse=True)]
             sorted_today_messages.insert(0, f"【今日汇总】\n"
@@ -1016,9 +968,6 @@ class GetSiteData(_PluginBase):
                                             f"————————————")
             self.post_message(mtype=NotificationType.SiteMessage,
                               title="今日站点数据统计", text="\n".join(sorted_today_messages))
-        if event:
-            self.post_message(channel=event.event_data.get("channel"),
-                              title="站点数据刷新完成！", userid=event.event_data.get("user"))
 
     def refresh_by_domain(self, domain: str, apikey: str) -> schemas.Response:
         """
@@ -1043,3 +992,55 @@ class GetSiteData(_PluginBase):
             success=False,
             message=f"站点 {domain} 不存在"
         )
+
+    @staticmethod
+    def __sub_data(self, d1: dict, d2: dict):
+        """
+        计算两个字典相同Key值的差值（如果值为数字），返回新字典
+        """
+        if not d1:
+            return {}
+        if not d2:
+            return d1
+        d = {k: self.__to_numeric(d1.get(k)) - self.__to_numeric(d2.get(k)) for k in d1
+             if k in d2 and self.__is_digit(d1.get(k)) and self.__is_digit(d2.get(k))}
+        # 把小于0的数据变成0
+        for k, v in d.items():
+            if str(v).isdigit() and int(v) < 0:
+                d[k] = 0
+        return d
+
+    @staticmethod
+    def __gb(value: int) -> float:
+        """
+        转换为GB，保留1位小数
+        """
+        if not value:
+            return 0
+        return round(float(value) / 1024 / 1024 / 1024, 1)
+
+    @staticmethod
+    def __is_digit(value: any) -> bool:
+        """
+        判断是否为数字
+        """
+        if value is None:
+            return False
+        if isinstance(value, float) or isinstance(value, int):
+            return True
+        if isinstance(value, str):
+            return value.isdigit()
+        return False
+
+    @staticmethod
+    def __to_numeric(value: any) -> int:
+        """
+        将值转换为整数
+        """
+        if isinstance(value, str):
+            return int(float(value))
+        elif isinstance(value, float) or isinstance(value, int):
+            return int(value)
+        else:
+            logger.error(f'数据类型转换错误 ({value})')
+            return 0
