@@ -8,6 +8,7 @@
         "author": "jianlongzhang1990,lightolly,jxxghp",
         "level": 2,
         "history": {
+            "v1.4.0": "增加通知消息",
             "v1.3": "增加通知消息",
             "v1.2": "继续修复增量数据统计问题",
             "v1.1": "修复增量数据统计问题",
