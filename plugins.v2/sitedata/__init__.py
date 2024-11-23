@@ -18,6 +18,7 @@ from app.log import logger
 from app.plugins import _PluginBase
 from app.schemas.types import EventType
 from app.utils.string import StringUtils
+from app.schemas import NotificationType, ServiceInfo
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
