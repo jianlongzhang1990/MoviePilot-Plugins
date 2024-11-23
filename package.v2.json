@@ -1,18 +1,14 @@
 {
     "SiteData": {
-        "name": "站点数据统计-通知消息版",
-        "description": "站点统计数据图表。",
+        "name": "获取站点数据",
+        "description": "站刷新站点数据，并发送消息，生成站点统计数据图表。",
         "labels": "站点,仪表板",
-        "version": "1.4.0",
+        "version": "1.0.0",
         "icon": "statistic.png",
         "author": "jianlongzhang1990,lightolly,jxxghp",
         "level": 2,
         "history": {
-            "v1.4.0": "增加通知消息",
-            "v1.3": "增加通知消息",
-            "v1.2": "继续修复增量数据统计问题",
-            "v1.1": "修复增量数据统计问题",
-            "v1.0": "MoviePilot V2 版本站点数据统计插件"
+            "v1.0.0": "基于MoviePilot V2 版本站点数据统计插件，增加站点数据消息通知"
         }
     },
     "AutoSeed": {
