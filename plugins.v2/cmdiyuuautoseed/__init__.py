@@ -18,7 +18,7 @@ from app.helper.sites import SitesHelper
 from app.helper.torrent import TorrentHelper
 from app.log import logger
 from app.plugins import _PluginBase
-from app.plugins.iyuuautoseed.iyuu_helper import IyuuHelper
+from app.plugins.cmdiyuuautoseed.iyuu_helper import IyuuHelper
 from app.schemas import NotificationType, ServiceInfo
 from app.schemas.types import EventType
 from app.utils.http import RequestUtils

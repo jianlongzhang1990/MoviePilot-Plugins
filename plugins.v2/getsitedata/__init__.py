@@ -32,7 +32,7 @@ def format_bonus(bonus):
 
 class GetSiteData(_PluginBase):
     # 插件名称
-    plugin_name = "获取站点数据"
+    plugin_name = "站点数据"
     # 插件描述
     plugin_desc = "刷新站点数据，发送数据消息通知，生成站点统计数据图表。"
     # 插件图标
@@ -658,7 +658,7 @@ class GetSiteData(_PluginBase):
         elements = [
             {
                 'component': 'VRow',
-                'content': self.__get_total_elements(
+                'content': self.__get_total_elements(self,
                     today=today,
                     stattistic_data=stattistic_data,
                     yesterday_sites_data=yesterday_sites_data,
@@ -688,6 +688,7 @@ class GetSiteData(_PluginBase):
 
         # 站点统计
         site_totals = self.__get_total_elements(
+            self,
             today=today,
             stattistic_data=stattistic_data,
             yesterday_sites_data=yesterday_sites_data,
