@@ -1,4 +1,3 @@
-import time
 import warnings
 from datetime import datetime, timedelta
 from threading import Lock
@@ -38,7 +37,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "1.0.0"
+    plugin_version = "1.0.1"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -539,7 +538,7 @@ class GetSiteData(_PluginBase):
             # 今日上传站点
             upload_sites = [site for site in uploads.keys()]
             # 今日上传数据
-            upload_datas = [__gb(data.get("upload")) for data in uploads.values()]
+            upload_datas = [self.__gb(data.get("upload")) for data in uploads.values()]
             # 今日上传总量
             today_upload = round(sum(upload_datas), 2)
             # 今日下载
@@ -547,7 +546,7 @@ class GetSiteData(_PluginBase):
             # 今日下载站点
             download_sites = [site for site in downloads.keys()]
             # 今日下载数据
-            download_datas = [__gb(data.get("download")) for data in downloads.values()]
+            download_datas = [self.__gb(data.get("download")) for data in downloads.values()]
             # 今日下载总量
             today_download = round(sum(download_datas), 2)
             # 今日上传下载元素
