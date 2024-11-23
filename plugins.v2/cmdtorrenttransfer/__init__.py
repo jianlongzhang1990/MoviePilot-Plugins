@@ -30,7 +30,7 @@ class CMDTorrentTransfer(_PluginBase):
     # 插件图标
     plugin_icon = "seed.png"
     # 插件版本
-    plugin_version = "0.0.1"
+    plugin_version = "1.0.0"
     # 插件作者
     plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页

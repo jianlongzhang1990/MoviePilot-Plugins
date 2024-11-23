@@ -26,13 +26,13 @@ from app.utils.string import StringUtils
 
 class CmdIyuuAutoSeed(_PluginBase):
     # 插件名称
-    plugin_name = "远程命令辅种"
+    plugin_name = "辅种"
     # 插件描述
     plugin_desc = "基于IYUU官方Api实现自动辅种，可远程命令。"
     # 插件图标
     plugin_icon = "IYUU.png"
     # 插件版本
-    plugin_version = "0.1"
+    plugin_version = "1.0.0"
     # 插件作者
     plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页
@@ -68,7 +68,7 @@ class CmdIyuuAutoSeed(_PluginBase):
     _size = None
     _clearcache = False
     # 退出事件
-    _event = Event()
+    _event = ThreadEvent()
     # 种子链接xpaths
     _torrent_xpaths = [
         "//form[contains(@action, 'download.php?id=')]/@action",

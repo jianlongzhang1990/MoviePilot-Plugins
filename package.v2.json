@@ -1,6 +1,6 @@
 {
     "GetSiteData": {
-        "name": "获取站点数据",
+        "name": "站点数据",
         "description": "刷新站点数据，发送数据消息通知，生成站点统计数据图表。",
         "labels": "站点,仪表板",
         "version": "1.0.0",
@@ -20,19 +20,19 @@
         "author": "jianlongzhang1990,jxxghp",
         "level": 2,
         "history": {
-            "v0.0.1": "于MoviePilot V2 版本自动转移做种插件，增加支持远程命令。"
+            "v1.0.0": "于MoviePilot V2 版本自动转移做种插件，增加支持远程命令。"
         }
     },
         "CmdIyuuAutoSeed": {
         "name": "辅种",
         "description": "基于MoviePilot V2 版本自动辅种插件，增加支持远程命令。",
         "labels": "辅种,IYUU",
-        "version": "0.0.1",
+        "version": "1.0.0",
         "icon": "IYUU.png",
         "author": "jianlongzhang1990,jxxghp",
         "level": 2,
         "history": {
-            "v0.0.1": "基于MoviePilot V2 版本自动辅种插件，增加支持远程命令。"
+            "v1.0.0": "基于MoviePilot V2 版本自动辅种插件，增加支持远程命令。"
         }
     }
 }
