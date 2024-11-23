@@ -917,6 +917,7 @@ class SiteData(_PluginBase):
                               userid=event.event_data.get("user"))
         SiteChain().refresh_userdatas()
         # 获取数据
+        logger.info("消息数据")
         today, stattistic_data, yesterday_sites_data = self.__get_data()
         if not stattistic_data:
             self.post_message(channel=event.event_data.get("channel"),
@@ -931,6 +932,7 @@ class SiteData(_PluginBase):
         # 总做种体积
         total_seed_size = sum([data.seeding_size for data in stattistic_data if data.seeding_size])
         rand = 0
+        logger.info("消息数据2")
         for data in stattistic_data:
             upload = data.upload
             download = data.download
