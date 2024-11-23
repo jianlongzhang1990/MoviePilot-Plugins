@@ -1262,12 +1262,12 @@ class CmdIyuuAutoSeed(_PluginBase):
         :return: 命令关键字、事件、描述、附带数据
         """
         return [{
-            "cmd": "/auto_seed",
+            "cmd": "/cmd_auto_seed",
             "event": EventType.PluginAction,
             "desc": "辅种",
             "category": "站点",
             "data": {
-                "action": "auto_seed"
+                "action": "cmd_auto_seed"
             }
         }]
 
@@ -1278,7 +1278,7 @@ class CmdIyuuAutoSeed(_PluginBase):
         """
         if event:
             event_data = event.event_data
-            if not event_data or event_data.get("action") != "auto_seed":
+            if not event_data or event_data.get("action") != "cmd_auto_seed":
                 return
             logger.info("收到命令，开始自动辅种 ...")
             self.post_message(channel=event.event_data.get("channel"),
