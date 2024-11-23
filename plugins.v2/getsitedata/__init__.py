@@ -530,7 +530,7 @@ class GetSiteData(_PluginBase):
                     yesterday_data = yesterday_datas[0]
                 else:
                     yesterday_data = None
-                inc = self.__sub_data(data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
+                inc = self.__sub_data(self, data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
                 if inc:
                     inc_data[data.name] = inc
             # 今日上传
