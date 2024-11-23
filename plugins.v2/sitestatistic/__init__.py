@@ -36,7 +36,7 @@ class SiteData(_PluginBase):
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
-    author_url = "https://github.com/lightolly"
+    author_url = "https://github.com/jianlongzhang1990"
     # 插件配置项ID前缀
     plugin_config_prefix = "sitesdata_"
     # 加载顺序
@@ -85,12 +85,12 @@ class SiteData(_PluginBase):
         :return: 命令关键字、事件、描述、附带数据
         """
         return [{
-            "cmd": "/site_statistic",
+            "cmd": "/site_data",
             "event": EventType.PluginAction,
-            "desc": "站点数据统计",
+            "desc": "站点数据统计-通知消息",
             "category": "站点",
             "data": {
-                "action": "site_statistic"
+                "action": "site_data"
             }
         }]
 
@@ -908,7 +908,7 @@ class SiteData(_PluginBase):
         """
         if event:
             event_data = event.event_data
-            if not event_data or event_data.get("action") != "site_statistic":
+            if not event_data or event_data.get("action") != "site_data":
                 return
             logger.info("收到命令，开始刷新站点数据 ...")
             self.post_message(channel=event.event_data.get("channel"),

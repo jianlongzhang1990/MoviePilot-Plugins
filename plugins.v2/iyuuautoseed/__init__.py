@@ -1,7 +1,7 @@
 import os
 import re
 from datetime import datetime, timedelta
-from threading import Event
+from threading import Event as ThreadEvent
 from typing import Any, Dict, List, Optional, Tuple
 
 import pytz
@@ -11,7 +11,8 @@ from lxml import etree
 from ruamel.yaml import CommentedMap
 
 from app.core.config import settings
-from app.core.event import eventmanager
+from app import schemas
+from app.core.event import Event, eventmanager
 from app.db.site_oper import SiteOper
 from app.helper.downloader import DownloaderHelper
 from app.helper.sites import SitesHelper
@@ -24,20 +25,19 @@ from app.schemas.types import EventType
 from app.utils.http import RequestUtils
 from app.utils.string import StringUtils
 
-
-class IYUUAutoSeed(_PluginBase):
+class AutoSeed(_PluginBase):
     # 插件名称
-    plugin_name = "IYUU自动辅种"
+    plugin_name = "IYUU自动辅种-命令版本"
     # 插件描述
-    plugin_desc = "基于IYUU官方Api实现自动辅种。"
+    plugin_desc = "基于IYUU官方Api实现自动辅种，可远程命令。"
     # 插件图标
     plugin_icon = "IYUU.png"
     # 插件版本
-    plugin_version = "2.2"
+    plugin_version = "2.3"
     # 插件作者
-    plugin_author = "jxxghp"
+    plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页
-    author_url = "https://github.com/jxxghp"
+    author_url = "https://github.com/jianlongzhang1990"
     # 插件配置项ID前缀
     plugin_config_prefix = "iyuuautoseed_"
     # 加载顺序
@@ -1255,3 +1255,37 @@ class IYUUAutoSeed(_PluginBase):
                 self._sites = sites
                 # 保存配置
                 self.__update_config()
+
+    @staticmethod
+    def get_command() -> List[Dict[str, Any]]:
+        """
+        定义远程控制命令
+        :return: 命令关键字、事件、描述、附带数据
+        """
+        return [{
+            "cmd": "/auto_seed",
+            "event": EventType.PluginAction,
+            "desc": "自动辅种",
+            "category": "站点",
+            "data": {
+                "action": "auto_seed"
+            }
+        }]
+
+    @eventmanager.register(EventType.PluginAction)
+    def refresh(self, event: Event):
+        """
+        刷新站点数据
+        """
+        if event:
+            event_data = event.event_data
+            if not event_data or event_data.get("action") != "auto_seed":
+                return
+            logger.info("收到命令，开始自动辅种 ...")
+            self.post_message(channel=event.event_data.get("channel"),
+                              title="开始辅种 ...",
+                              userid=event.event_data.get("user"))
+        self.auto_seed()
+        if event:
+            self.post_message(channel=event.event_data.get("channel"),
+                              title="辅种完成！", userid=event.event_data.get("user"))
