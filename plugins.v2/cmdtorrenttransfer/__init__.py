@@ -10,6 +10,7 @@ from apscheduler.triggers.cron import CronTrigger
 from bencode import bdecode, bencode
 
 from app.core.event import Event, eventmanager
+from app.core.event import EventManager
 from app.core.config import settings
 from app.helper.downloader import DownloaderHelper
 from app.helper.torrent import TorrentHelper
@@ -24,13 +25,13 @@ from app.schemas.types import EventType
 
 class CMDTorrentTransfer(_PluginBase):
     # 插件名称
-    plugin_name = "转移做种"
+    plugin_name = "转种+辅种"
     # 插件描述
-    plugin_desc = "定期转移下载器中的做种任务到另一个下载器,支持远程命令。"
+    plugin_desc = "定期转移下载器中的做种任务到另一个下载器,支持远程命令，并自动辅种。"
     # 插件图标
     plugin_icon = "seed.png"
     # 插件版本
-    plugin_version = "1.0.0"
+    plugin_version = "1.0.1"
     # 插件作者
     plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页
@@ -72,10 +73,12 @@ class CMDTorrentTransfer(_PluginBase):
     _is_recheck_running = False
     # 任务标签
     _torrent_tags = []
+    eventmanager = None
 
     def init_plugin(self, config: dict = None):
         self.torrent_helper = TorrentHelper()
         self.downloader_helper = DownloaderHelper()
+        self.eventmanager = EventManager()
         # 读取配置
         if config:
             self._enabled = config.get("enabled")
@@ -190,6 +193,17 @@ class CMDTorrentTransfer(_PluginBase):
         if event:
             self.post_message(channel=event.event_data.get("channel"),
                               title="转种完成！", userid=event.event_data.get("user"))
+        # 执行辅种命令
+        self.eventmanager.send_event(
+            EventType.CommandExcute,
+            {
+                "cmd": "/cmd_auto_seed",
+                "user": event.event_data.get("user"),
+                "channel": event.event_data.get("channel"),
+                "source": event.event_data.get("source")
+            }
+        )
+
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
