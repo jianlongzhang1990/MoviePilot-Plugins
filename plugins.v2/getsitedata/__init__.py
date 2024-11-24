@@ -866,10 +866,12 @@ class GetSiteData(_PluginBase):
                               title="开始刷新站点数据 ...",
                               userid=event.event_data.get("user"))
         self.notify(event)
+        self.post_message(channel=event.event_data.get("channel"),
+                          title="站点数据通知完成，触发刷新站点数据！", userid=event.event_data.get("user"))
         SiteChain().refresh_userdatas()
         if event:
-            self.post_message(channel=event.event_data.get("channel"),
-                              title="站点数据刷新完成！", userid=event.event_data.get("user"))
+            logger.info("站点数据刷新完成")
+
 
     @eventmanager.register(EventType.SiteRefreshed)
     def notify(self, event):
