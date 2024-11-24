@@ -73,12 +73,12 @@ class CMDTorrentTransfer(_PluginBase):
     _is_recheck_running = False
     # 任务标签
     _torrent_tags = []
-    eventmanager = None
+    cmd_event = None
 
     def init_plugin(self, config: dict = None):
         self.torrent_helper = TorrentHelper()
         self.downloader_helper = DownloaderHelper()
-        self.eventmanager = EventManager()
+        self.cmd_event = EventManager()
         # 读取配置
         if config:
             self._enabled = config.get("enabled")
@@ -194,7 +194,7 @@ class CMDTorrentTransfer(_PluginBase):
             self.post_message(channel=event.event_data.get("channel"),
                               title="转种完成！", userid=event.event_data.get("user"))
         # 执行辅种命令
-        self.eventmanager.send_event(
+        self.cmd_event.send_event(
             EventType.CommandExcute,
             {
                 "cmd": "/cmd_auto_seed",
