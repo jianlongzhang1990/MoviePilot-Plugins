@@ -3,11 +3,12 @@
         "name": "站点数据",
         "description": "刷新站点数据，发送数据消息通知，生成站点统计数据图表。",
         "labels": "站点,仪表板",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "icon": "statistic.png",
         "author": "jianlongzhang1990,lightolly,jxxghp",
         "level": 2,
         "history": {
+            "v1.0.5": "站点数据刷新时触发通知",
             "v1.0.4": "站点数据刷新时触发通知",
             "v1.0.3": "先通知，后刷新数据",
             "v1.0.2": "基于MoviePilot V2 版本站点数据统计插件，增加站点数据消息通知"
