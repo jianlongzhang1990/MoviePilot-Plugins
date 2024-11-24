@@ -37,7 +37,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "1.0.5"
+    plugin_version = "1.0.7"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -868,7 +868,6 @@ class GetSiteData(_PluginBase):
         self.notify(event)
         self.post_message(channel=event.event_data.get("channel"),
                           title="站点数据通知完成，触发刷新站点数据！", userid=event.event_data.get("user"))
-        SiteChain().refresh_userdatas()
         if event:
             logger.info("站点数据刷新完成")
 

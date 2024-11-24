@@ -31,7 +31,7 @@ class CMDTorrentTransfer(_PluginBase):
     # 插件图标
     plugin_icon = "seed.png"
     # 插件版本
-    plugin_version = "1.0.1"
+    plugin_version = "1.0.2"
     # 插件作者
     plugin_author = "jianlongzhang1990,jxxghp"
     # 作者主页
@@ -169,7 +169,7 @@ class CMDTorrentTransfer(_PluginBase):
         return [{
             "cmd": "/transfer_seed",
             "event": EventType.PluginAction,
-            "desc": "转种",
+            "desc": "转种+辅种",
             "category": "站点",
             "data": {
                 "action": "transfer_seed"
