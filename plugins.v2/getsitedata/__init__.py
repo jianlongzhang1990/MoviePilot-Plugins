@@ -37,7 +37,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "1.0.9"
+    plugin_version = "1.0.10"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -865,112 +865,108 @@ class GetSiteData(_PluginBase):
             self.post_message(channel=event.event_data.get("channel"),
                               title="开始刷新站点数据 ...",
                               userid=event.event_data.get("user"))
-        self.notify(event)
+        self.notify_site_data(event)
         self.post_message(channel=event.event_data.get("channel"),
                           title="站点数据通知完成！", userid=event.event_data.get("user"))
         if event:
             logger.info("站点数据刷新完成")
 
 
-    def notify(self, event):
-        if event:
-            event_data = event.event_data
-            if not event_data or event_data.get("site_id") != "*":
-                return
-            # 获取数据
-            today, stattistic_data, yesterday_sites_data = self.__get_data()
-            if not stattistic_data:
-                self.post_message(channel=event.event_data.get("channel"),
-                                  title="暂无汇总数据！", userid=event.event_data.get("user"))
-            messages = {}
-            # 总上传量
-            total_upload = sum([data.upload for data in stattistic_data if data.upload])
-            # 总下载量
-            total_download = sum([data.download for data in stattistic_data if data.download])
-            # 总做种数
-            total_seed = sum([data.seeding for data in stattistic_data if data.seeding])
-            # 总做种体积
-            total_seed_size = sum([data.seeding_size for data in stattistic_data if data.seeding_size])
-            rand = 0
-            for data in stattistic_data:
-                upload = data.upload
-                download = data.download
-                seed = data.seeding
-                seed_size = data.seeding_size
+    def notify_site_data(self, event):
+        # 获取数据
+        today, stattistic_data, yesterday_sites_data = self.__get_data()
+        if not stattistic_data:
+            self.post_message(channel=event.event_data.get("channel"),
+                              title="暂无汇总数据！", userid=event.event_data.get("user"))
+        messages = {}
+        # 总上传量
+        total_upload = sum([data.upload for data in stattistic_data if data.upload])
+        # 总下载量
+        total_download = sum([data.download for data in stattistic_data if data.download])
+        # 总做种数
+        total_seed = sum([data.seeding for data in stattistic_data if data.seeding])
+        # 总做种体积
+        total_seed_size = sum([data.seeding_size for data in stattistic_data if data.seeding_size])
+        rand = 0
+        for data in stattistic_data:
+            upload = data.upload
+            download = data.download
+            seed = data.seeding
+            seed_size = data.seeding_size
 
-                if upload > 0 or download > 0:
-                    messages[upload + (rand / 1000)] = (
-                            f"【{data.name}】{today}\n"
-                            + f"上传量：{StringUtils.str_filesize(upload)}\n"
-                            + f"下载量：{StringUtils.str_filesize(download)}\n"
-                            + f"分享率：{data.ratio}\n"
-                            + f"做种数：{seed}\n"
-                            + f"做种体积：{StringUtils.str_filesize(seed_size)}\n"
-                            + f"魔力值：{format_bonus(data.bonus or 0)}\n"
-                            + "————————————"
-                    )
-                rand += 1
-            if total_upload or total_download:
-                sorted_messages = [messages[key] for key in sorted(messages.keys(), reverse=True)]
-                sorted_messages.insert(0, f"【汇总】\n"
-                                          f"总上传：{StringUtils.str_filesize(total_upload)}\n"
-                                          f"总下载：{StringUtils.str_filesize(total_download)}\n"
-                                          f"总做种数：{total_seed}\n"
-                                          f"总做种体积：{StringUtils.str_filesize(total_seed_size)}\n"
-                                          f"————————————")
-                self.post_message(mtype=NotificationType.SiteMessage,
-                                  title="站点数据统计", text="\n".join(sorted_messages))
-            # 计算增量数据集
-            today_messages = {}
-            inc_data = {}
-            for today_data in stattistic_data:
-                yesterday_datas = [yd for yd in yesterday_sites_data if yd.domain == today_data.domain]
-                logger.info(f'计算今日数据yd.domain: ({today_data.domain})today_data.domain: ({today_data.domain})')
-                if yesterday_datas:
-                    yesterday_data = yesterday_datas[0]
-                else:
-                    yesterday_data = None
-                inc = self.__sub_data(self, today_data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
-                if inc:
-                    inc_data[today_data.name] = inc
-            logger.info(f'计算今日数据inc_data: ({inc_data})')
-            # 今日上传
-            uploads = {k: v for k, v in inc_data.items() if v.get("upload") if v.get("upload") > 0}
-            # 今日上传站点
-            upload_sites = [site for site in uploads.keys()]
-            # 今日上传数据
-            upload_datas = [self.__gb(data.get("upload")) for data in uploads.values()]
-            # 今日上传总量
-            today_upload = round(sum(upload_datas), 2)
-            # 今日下载
-            downloads = {k: v for k, v in inc_data.items() if v.get("download") if v.get("download") > 0}
-            # 今日下载站点
-            download_sites = [site for site in downloads.keys()]
-            # 今日下载数据
-            download_datas = [self.__gb(data.get("download")) for data in downloads.values()]
-            # 今日下载总量
-            today_download = round(sum(download_datas), 2)
-            rand = 0
-            for site, data in inc_data.items():
-                upload = data.get("upload")
-                download = data.get("download")
+            if upload > 0 or download > 0:
+                messages[upload + (rand / 1000)] = (
+                        f"【{data.name}】{today}\n"
+                        + f"上传量：{StringUtils.str_filesize(upload)}\n"
+                        + f"下载量：{StringUtils.str_filesize(download)}\n"
+                        + f"分享率：{data.ratio}\n"
+                        + f"做种数：{seed}\n"
+                        + f"做种体积：{StringUtils.str_filesize(seed_size)}\n"
+                        + f"魔力值：{format_bonus(data.bonus or 0)}\n"
+                        + "————————————"
+                )
+            rand += 1
+        if total_upload or total_download:
+            sorted_messages = [messages[key] for key in sorted(messages.keys(), reverse=True)]
+            sorted_messages.insert(0, f"【汇总】\n"
+                                      f"总上传：{StringUtils.str_filesize(total_upload)}\n"
+                                      f"总下载：{StringUtils.str_filesize(total_download)}\n"
+                                      f"总做种数：{total_seed}\n"
+                                      f"总做种体积：{StringUtils.str_filesize(total_seed_size)}\n"
+                                      f"————————————")
+            self.post_message(mtype=NotificationType.SiteMessage,
+                              title="站点数据统计", text="\n".join(sorted_messages))
+        # 计算增量数据集
+        today_messages = {}
+        inc_data = {}
+        for today_data in stattistic_data:
+            yesterday_datas = [yd for yd in yesterday_sites_data if yd.domain == today_data.domain]
+            logger.info(f'计算今日数据yd.domain: ({today_data.domain})today_data.domain: ({today_data.domain})')
+            if yesterday_datas:
+                yesterday_data = yesterday_datas[0]
+            else:
+                yesterday_data = None
+            inc = self.__sub_data(self, today_data.to_dict(), yesterday_data.to_dict() if yesterday_data else None)
+            if inc:
+                inc_data[today_data.name] = inc
+        logger.info(f'计算今日数据inc_data: ({inc_data})')
+        # 今日上传
+        uploads = {k: v for k, v in inc_data.items() if v.get("upload") if v.get("upload") > 0}
+        # 今日上传站点
+        upload_sites = [site for site in uploads.keys()]
+        # 今日上传数据
+        upload_datas = [self.__gb(data.get("upload")) for data in uploads.values()]
+        # 今日上传总量
+        today_upload = round(sum(upload_datas), 2)
+        # 今日下载
+        downloads = {k: v for k, v in inc_data.items() if v.get("download") if v.get("download") > 0}
+        # 今日下载站点
+        download_sites = [site for site in downloads.keys()]
+        # 今日下载数据
+        download_datas = [self.__gb(data.get("download")) for data in downloads.values()]
+        # 今日下载总量
+        today_download = round(sum(download_datas), 2)
+        rand = 0
+        for site, data in inc_data.items():
+            upload = data.get("upload")
+            download = data.get("download")
 
-                if upload > 0 or download > 0:
-                    today_messages[upload + (rand / 1000)] = (
-                            f"【{site}】{today}\n"
-                            + f"上传量：{StringUtils.str_filesize(upload)}\n"
-                            + f"下载量：{StringUtils.str_filesize(download)}\n"
-                            + "————————————"
-                    )
-                rand += 1
-            if today_upload or today_download:
-                sorted_today_messages = [today_messages[key] for key in sorted(today_messages.keys(), reverse=True)]
-                sorted_today_messages.insert(0, f"【今日汇总】\n"
-                                                f"总上传：{StringUtils.str_filesize(today_upload)}\n"
-                                                f"总下载：{StringUtils.str_filesize(today_download)}\n"
-                                                f"————————————")
-                self.post_message(mtype=NotificationType.SiteMessage,
-                                  title="今日站点数据统计", text="\n".join(sorted_today_messages))
+            if upload > 0 or download > 0:
+                today_messages[upload + (rand / 1000)] = (
+                        f"【{site}】{today}\n"
+                        + f"上传量：{StringUtils.str_filesize(upload)}\n"
+                        + f"下载量：{StringUtils.str_filesize(download)}\n"
+                        + "————————————"
+                )
+            rand += 1
+        if today_upload or today_download:
+            sorted_today_messages = [today_messages[key] for key in sorted(today_messages.keys(), reverse=True)]
+            sorted_today_messages.insert(0, f"【今日汇总】\n"
+                                            f"总上传：{StringUtils.str_filesize(today_upload)}\n"
+                                            f"总下载：{StringUtils.str_filesize(today_download)}\n"
+                                            f"————————————")
+            self.post_message(mtype=NotificationType.SiteMessage,
+                              title="今日站点数据统计", text="\n".join(sorted_today_messages))
 
     def refresh_by_domain(self, domain: str, apikey: str) -> schemas.Response:
         """
