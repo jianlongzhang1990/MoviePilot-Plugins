@@ -37,7 +37,7 @@ class GetSiteData(_PluginBase):
     # 插件图标
     plugin_icon = "statistic.png"
     # 插件版本
-    plugin_version = "1.0.8"
+    plugin_version = "1.0.9"
     # 插件作者
     plugin_author = "jianlongzhang1990,lightolly,jxxghp"
     # 作者主页
@@ -852,7 +852,7 @@ class GetSiteData(_PluginBase):
     def stop_service(self):
         pass
 
-
+    @eventmanager.register(EventType.PluginAction)
     def refresh(self, event: Optional[Event] = None):
         """
         刷新站点数据
@@ -872,7 +872,6 @@ class GetSiteData(_PluginBase):
             logger.info("站点数据刷新完成")
 
 
-    @eventmanager.register(EventType.SiteRefreshed)
     def notify(self, event):
         if event:
             event_data = event.event_data
